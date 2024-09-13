@@ -51,7 +51,7 @@ This Code of Conduct applies within all project spaces—such as issue trackers,
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the core team at [othmane@maya-agency.ma]. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the core team at [o.nejdi@mavrojs.dev]. All complaints will be reviewed and investigated promptly and fairly.
 
 The core team is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.
 
