@@ -125,4 +125,4 @@ mavro is licensed under the [MIT License](LICENSE). See the LICENSE file for mor
 
 ## 🌐 Contact
 
-For questions, suggestions, or support, feel free to reach out to us on [GitHub Discussions](https://github.com/othastudio/mavro/discussions) or join our community on [Discord](https://discord.gg/AuYTgJYFKT).
+For questions, suggestions, or support, feel free to reach out to us on [GitHub Discussions](https://github.com/mavrojs/mavro/discussions) or join our community on [Discord](https://discord.gg/AuYTgJYFKT).
