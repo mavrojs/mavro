@@ -1,0 +1,30 @@
+{
+  "name": "mavro",
+  "version": "0.1.0",
+  "description": "A minimal, fast, and scalable Node.js framework.",
+  "main": "dist/index.js",
+  "keywords": [
+    "nodejs",
+    "framework",
+    "koa",
+    "typescript",
+    "mvc"
+  ],
+  "contributors": [
+    "Othmane Nejdi <github@iietmoon>"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "start": "ts-node dist/index.js"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mavrojs/mavro.git"
+  },
+  "packageManager": "npm@10.8.1",
+  "engines": {
+    "node": ">=v18.18.0"
+  }
+}

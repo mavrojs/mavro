@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "es2018",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "dist/**/*.js",
+        "src/middlewares/.gitkeep",
+        "src/models/.gitkeep",
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts",
+        "__tests__/**/*.ts"
+    ],
+    "typeRoots": ["./node_modules/@types", "./@types"],
+}
