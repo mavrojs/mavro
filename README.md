@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://otha.studio/oss/mavro">
-    <img alt="mavro" width="125" src="./.github/resources/mavro-icon.svg">
-    <h1 align="center">A minimal, fast, and scalable Node.js framework.</h1>
+    <img alt="mavro" width="95" src="./.github/resources/mavro-icon.svg">
+    <h2 align="center">A minimal, fast, and scalable Node.js framework.</h2>
   </a>
 </p>
 <p align="center">
