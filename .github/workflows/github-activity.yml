@@ -20,7 +20,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           if [ "${{ github.event_name }}" == "push" ]; then
-            MESSAGE="A new commit by \`${{ github.actor }}\` on branch \`${{ github.ref_name }}\`.\nCommit Message: \`${{ github.event.head_commit.message }}\`"
+            MESSAGE="A new commit by \`${{ github.actor }}\` on branch \`${{ github.ref }}\`.\nCommit Message: \`${{ github.event.head_commit.message }}\`"
           elif [ "${{ github.event_name }}" == "pull_request" ]; then
             MESSAGE="A new Pull Request: \`${{ github.event.pull_request.title }}\` by \`${{ github.actor }}\`. [View Pull Request](${{ github.event.pull_request.html_url }})"
           elif [ "${{ github.event_name }}" == "issues" ]; then
@@ -30,6 +30,9 @@ jobs:
           else
             MESSAGE="A new activity occurred in the repository."
           fi
+
+          # Debugging: echo the message
+          echo "Message to be sent: $MESSAGE"
 
           curl -H "Content-Type: application/json" \
             -d "{\"content\": \"$MESSAGE\"}" \
