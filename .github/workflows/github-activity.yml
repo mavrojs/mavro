@@ -15,7 +15,7 @@ jobs:
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         DISCORD_USERNAME: mavrosjs
-        DISCORD_AVATAR: https://raw.githubusercontent.com/mavrojs/mavro/6caa939c0475efbb65ecdba02f4e27db18b3c0a6/.github/resources/mavro-icon.svg
+        DISCORD_AVATAR: https://i.ibb.co/9w7cb51/mavro-social-media.png
       uses: Ilshidur/action-discord@master
       with:
         args: 'A new activity in mavrojs/mavro.'
