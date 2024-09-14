@@ -1,0 +1,36 @@
+name: GitHub Activity to Discord
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, closed, reopened]
+  issues:
+    types: [opened, closed, reopened]
+  release:
+    types: [published]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Notification to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            MESSAGE="A new commit by \`${{ github.actor }}\` on branch \`${{ github.ref_name }}\`.\nCommit Message: \`${{ github.event.head_commit.message }}\`"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            MESSAGE="A new Pull Request: \`${{ github.event.pull_request.title }}\` by \`${{ github.actor }}\`. [View Pull Request](${{ github.event.pull_request.html_url }})"
+          elif [ "${{ github.event_name }}" == "issues" ]; then
+            MESSAGE="A new Issue: \`${{ github.event.issue.title }}\` by \`${{ github.actor }}\`. [View Issue](${{ github.event.issue.html_url }})"
+          elif [ "${{ github.event_name }}" == "release" ]; then
+            MESSAGE="A new Release: \`${{ github.event.release.name }}\` published by \`${{ github.actor }}\`. [View Release](${{ github.event.release.html_url }})"
+          else
+            MESSAGE="A new activity occurred in the repository."
+          fi
+
+          curl -H "Content-Type: application/json" \
+            -d "{\"content\": \"$MESSAGE\"}" \
+            $DISCORD_WEBHOOK_URL
