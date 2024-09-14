@@ -1,42 +1,25 @@
-name: GitHub Activity to Discord
+name: Notification on push
 
 on:
   push:
     branches:
-      - '*'
-  pull_request:
-    types: [opened, closed, reopened]
-  issues:
-    types: [opened, closed, reopened]
-  release:
-    types: [published]
+    - master
 
 jobs:
-  notify-discord:
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Send Notification to Discord
+    - name: Discord notification
       env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        DISCORD_USERNAME: Github
-        DISCORD_AVATAR: https://cdn-icons-png.flaticon.com/512/4494/4494749.png
-      run: |
-        if [ "${{ github.event_name }}" == "push" ]; then
-          MESSAGE="A new commit by \`${{ github.actor }}\` on branch \`${{ github.ref_name }}\`.\nCommit Message: \`${{ github.event.head_commit.message }}\`"
-        elif [ "${{ github.event_name }}" == "pull_request" ]; then
-          MESSAGE="A new Pull Request: \`${{ github.event.pull_request.title }}\` by \`${{ github.actor }}\`. [View Pull Request](${{ github.event.pull_request.html_url }})"
-        elif [ "${{ github.event_name }}" == "issues" ]; then
-          MESSAGE="A new Issue: \`${{ github.event.issue.title }}\` by \`${{ github.actor }}\`. [View Issue](${{ github.event.issue.html_url }})"
-        elif [ "${{ github.event_name }}" == "release" ]; then
-          MESSAGE="A new Release: \`${{ github.event.release.name }}\` published by \`${{ github.actor }}\`. [View Release](${{ github.event.release.html_url }})"
-        else
-          MESSAGE="A new activity occurred in the repository."
-        fi
-
-        # Send message to Discord
-        RESPONSE=$(curl -H "Content-Type: application/json" \
-          -d "{\"content\": \"$MESSAGE\"}" \
-          $DISCORD_WEBHOOK_URL)
-
-        echo "Response from Discord: $RESPONSE"
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        DISCORD_USERNAME: OSS 117
+        DISCORD_AVATAR: https://resize.programme-television.ladmedia.fr/r/670,670/img/var/premiere/storage/images/tele-7-jours/news-tv/oss-117-le-caire-nid-d-espions-c8-le-show-de-jean-dujardin-4484285/90175763-1-fre-FR/OSS-117-Le-Caire-nid-d-espions-C8-Le-show-de-Jean-Dujardin.jpg
+      uses: Ilshidur/action-discord@master
+      with:
+        args: 'A new commit has been pushed to Ilshidur/action-discord.'
+    - name: Discord notification
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      uses: Ilshidur/action-discord@master
