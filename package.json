@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A minimal, fast, and scalable Node.js framework.",
   "main": "dist/index.js",
+  "type": "module",
   "keywords": [
     "nodejs",
     "framework",
@@ -17,7 +18,7 @@
     "build": "tsc",
     "dev": "nodemon --exec ts-node src/index.ts",
     "start": "ts-node dist/index.js",
-    "test": "node --test",
+    "test": "mocha 'dist/core/test/**/*.test.js' --require ts-node/register --loader ts-node/esm",
     "prepare": "husky"
   },
   "license": "MIT",
@@ -30,11 +31,17 @@
     "node": ">=v18.18.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.5",
+    "@types/chai": "^4.3.19",
+    "@types/mocha": "^10.0.8",
+    "@types/node": "^22.5.5",
+    "chai": "^5.1.1",
+    "esm": "^3.2.25",
+    "mocha": "^10.7.3",
+    "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
   }
 }

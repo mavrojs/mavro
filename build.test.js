@@ -3,7 +3,7 @@ const assert = require('assert');
 const fs = require('fs').promises;
 const path = require('path');
 
-const DIST_DIR = path.resolve(__dirname, "../dist");
+const DIST_DIR = path.resolve(__dirname, "./dist");
 
 test("TypeScript files should compile to JavaScript", async (t) => {
   await t.test("check if dist directory exists", async () => {

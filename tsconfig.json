@@ -12,14 +12,9 @@
     },
     "include": [
         "src/**/*.ts",
-        "dist/**/*.js",
-        "src/middlewares/.gitkeep",
-        "src/models/.gitkeep",
+        "src/core/test/**/*.test.ts"
     ],
     "exclude": [
-        "node_modules",
-        "**/*.spec.ts",
-        "__tests__/**/*.ts"
-    ],
-    "typeRoots": ["./node_modules/@types", "./@types"],
+        "node_modules"
+    ]
 }
