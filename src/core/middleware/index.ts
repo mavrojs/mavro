@@ -21,7 +21,7 @@ export class MiddlewareManager {
 
     await run(0);
   }
-}
+};
 
 export const loggerMiddleware: Middleware = (req: Request, res: Response, next: () => void) => {
   console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);

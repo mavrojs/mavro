@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "start": "ts-node dist/index.js",
     "test": "mocha 'dist/core/test/**/*.test.js' --require ts-node/register --loader ts-node/esm",
     "prepare": "husky"
