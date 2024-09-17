@@ -1,12 +1,17 @@
 import { app } from './core/app';
 import { Middleware, Request, Response } from './core/types';
 
-const helloWorld: Middleware = (req: Request, res: Response, next: () => void) => {
+const resWorld: Middleware = (req: Request, res: Response, next: () => void) => {
   res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ message: 'Hello, World!' }));
+  res.end(JSON.stringify({ message: 'Hello, World! from mavro' }));
+};
+const reqWorld: Middleware = (req: Request, res: Response, next: () => void) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ message: 'Hello, World! from mavro' }));
 };
 
-app.get('/mavro', helloWorld);
+app.get('/mavro', resWorld);
+app.post('/mavro', reqWorld);
 
 const PORT = 3000;
 app.listen(PORT, () => {
