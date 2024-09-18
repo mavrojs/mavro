@@ -1,8 +1,9 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { Request, Response, Middleware } from '../types';
-import { Router } from '../router';
+import { createServer, IncomingMessage, ServerResponse } from "http";
+import { Request, Response, Middleware } from "../types";
+import { Router } from "../router";
+import { Console } from "../utils";
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 class App {
   private router: Router;
@@ -15,6 +16,21 @@ class App {
   constructor(router: Router) {
     this.router = router;
   }
+
+  /**
+   * Logger middleware that logs incoming requests and the status code after the response is sent.
+   */
+  private logger: Middleware = (req: Request, res: Response, next: () => void) => {
+    const startTime = Date.now();
+
+    
+    res.on('finish', () => {
+      const duration = Date.now() - startTime;
+      Console.status(res.statusCode, `${req.method} ${req.url} ${res.statusCode} - ${duration}ms`)
+    });
+
+    next();
+  };
 
   /**
    * Registers a middleware function to be applied to incoming requests.
@@ -30,7 +46,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   get(path: string, handler: Middleware) {
-    this.router.register('GET', path, this.wrapHandler(handler));
+    this.router.register("GET", path, this.wrapHandler(handler));
   }
 
   /**
@@ -39,7 +55,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   post(path: string, handler: Middleware) {
-    this.router.register('POST', path, this.wrapHandler(handler));
+    this.router.register("POST", path, this.wrapHandler(handler));
   }
 
   /**
@@ -48,7 +64,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   put(path: string, handler: Middleware) {
-    this.router.register('PUT', path, this.wrapHandler(handler));
+    this.router.register("PUT", path, this.wrapHandler(handler));
   }
 
   /**
@@ -57,7 +73,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   delete(path: string, handler: Middleware) {
-    this.router.register('DELETE', path, this.wrapHandler(handler));
+    this.router.register("DELETE", path, this.wrapHandler(handler));
   }
 
   /**
@@ -66,7 +82,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   patch(path: string, handler: Middleware) {
-    this.router.register('PATCH', path, this.wrapHandler(handler));
+    this.router.register("PATCH", path, this.wrapHandler(handler));
   }
 
   /**
@@ -80,22 +96,13 @@ class App {
   }
 
   /**
-   * Registers a route with a specified method, path, and handler.
-   * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
-  */
-  prefix(path:string, handler:Middleware){
-    this.router
-  }
-
-  /**
-   * Wraps a route handler to include application-level middleware.
+   * Wraps a route handler to include application-level middleware and logger.
    * @param handler - The route handler to wrap.
    * @returns A function that applies middleware before invoking the route handler.
    */
   private wrapHandler(handler: Middleware): Middleware {
     return (req: Request, res: Response, next: () => void) => {
-      const chain = [...this.middleware, handler];
+      const chain = [this.logger, ...this.middleware, handler]; // Logger added first
       let index = 0;
   
       const applyMiddleware = async () => {
@@ -124,7 +131,7 @@ class App {
   
       applyMiddleware();  // Start middleware chain
     };
-  }  
+  }
 
   /**
    * Starts the server and listens for incoming requests on the specified port.
@@ -134,12 +141,12 @@ class App {
   listen(port: number, callback?: () => void) {
     const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       const method = req.method as HttpMethod;
-      const url = req.url || '/'; // Default to '/' if URL is undefined
+      const url = req.url || "/"; // Default to '/' if URL is undefined
 
       // Extend res to include a json method
       const extendedRes = res as Response;
       extendedRes.json = function (data: any) {
-        this.writeHead(200, { 'Content-Type': 'application/json' });
+        this.writeHead(200, { "Content-Type": "application/json" });
         this.end(JSON.stringify(data));
       };
 
@@ -147,8 +154,8 @@ class App {
         this.router.handleRequest(method, url, req, extendedRes);
       } catch (err) {
         // Handles any errors that occur during request processing
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Internal Server Error" }));
       }
     });
 
