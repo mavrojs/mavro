@@ -9,12 +9,13 @@ const authHandler:Middleware = (req:Request, res:Response, next:()=>void) =>{
 }
 
 const helloHandler: Middleware = (req:Request, res:Response) => {
-  res.json({ message: 'Hello World' });
+  const { uuid } = req.params;
+  res.json({ message: 'Hello World', uuid });
   return;
 };
 
 
-app.get('/hello', authHandler, helloHandler);
+app.get('/users/:uuid', authHandler, helloHandler);
 
 class HelloController{
     static async get(req:Request, res: Response): Promise<void>{
@@ -42,6 +43,6 @@ class HelloController{
 app.resource('/', [authHandler], HelloController)
 
 // Start the server
-app.listen(3000, () => {
+app.listen(1337, () => {
   Console.debug('Server is running on port 3000');
 });
