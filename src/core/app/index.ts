@@ -2,9 +2,15 @@ import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { Router } from '../router';
 import { Middleware } from '../types';
 
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
 class App {
   private router: Router;
 
+  /**
+   * Initializes the App with a Router instance.
+   * @param router - The Router instance to be used by the App.
+   */
   constructor(router: Router) {
     this.router = router;
   }
@@ -53,18 +59,14 @@ class App {
   patch(path: string, handler: Middleware) {
     this.router.register('PATCH', path, handler);
   }
-  
+
   /**
    * Registers a route with a specified method, path, and handler.
    * @param method - The HTTP method (GET, POST, PUT, DELETE, PATCH).
    * @param path - The path for the route.
    * @param handler - The middleware function to handle the route.
    */
-  route(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
-    path: string,
-    handler: Middleware
-  ) {
+  route(method: HttpMethod, path: string, handler: Middleware) {
     this.router.register(method, path, handler);
   }
 
@@ -75,10 +77,16 @@ class App {
    */
   listen(port: number, callback?: () => void) {
     const server = createServer((req: IncomingMessage, res: ServerResponse) => {
-      const method = req.method as string;
-      const url = req.url as string;
+      const method = req.method as HttpMethod;
+      const url = req.url || '/'; // Default to '/' if URL is undefined
 
-      this.router.handleRequest(method, url, req, res);
+      try {
+        this.router.handleRequest(method, url, req, res);
+      } catch (err) {
+        // Handles any errors that occur during request processing
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+      }
     });
 
     server.listen(port, callback);
