@@ -80,6 +80,15 @@ class App {
   }
 
   /**
+   * Registers a route with a specified method, path, and handler.
+   * @param path - The path for the route.
+   * @param handler - The middleware function to handle the route.
+  */
+  prefix(path:string, handler:Middleware){
+    this.router
+  }
+
+  /**
    * Wraps a route handler to include application-level middleware.
    * @param handler - The route handler to wrap.
    * @returns A function that applies middleware before invoking the route handler.
@@ -88,18 +97,34 @@ class App {
     return (req: Request, res: Response, next: () => void) => {
       const chain = [...this.middleware, handler];
       let index = 0;
-
-      const applyMiddleware = () => {
+  
+      const applyMiddleware = async () => {
         if (index < chain.length) {
-          chain[index++](req, res, applyMiddleware);
+          const currentMiddleware = chain[index++];
+          try {
+            await new Promise<void>((resolve, reject) => {
+              currentMiddleware(req, res, (err?: any) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve();
+                }
+              });
+            });
+            await applyMiddleware();  // Continue to the next middleware/handler
+          } catch (err) {
+            console.error(err);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+          }
         } else {
-          next();
+          next();  // All middleware processed, move to the next in line
         }
       };
-
-      applyMiddleware();
+  
+      applyMiddleware();  // Start middleware chain
     };
-  }
+  }  
 
   /**
    * Starts the server and listens for incoming requests on the specified port.
@@ -111,8 +136,15 @@ class App {
       const method = req.method as HttpMethod;
       const url = req.url || '/'; // Default to '/' if URL is undefined
 
+      // Extend res to include a json method
+      const extendedRes = res as Response;
+      extendedRes.json = function (data: any) {
+        this.writeHead(200, { 'Content-Type': 'application/json' });
+        this.end(JSON.stringify(data));
+      };
+
       try {
-        this.router.handleRequest(method, url, req, res);
+        this.router.handleRequest(method, url, req, extendedRes);
       } catch (err) {
         // Handles any errors that occur during request processing
         res.writeHead(500, { 'Content-Type': 'application/json' });
