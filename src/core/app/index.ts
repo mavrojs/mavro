@@ -1,11 +1,12 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { Request, Response, Middleware } from '../types';
 import { Router } from '../router';
-import { Middleware } from '../types';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 class App {
   private router: Router;
+  private middleware: Middleware[] = [];
 
   /**
    * Initializes the App with a Router instance.
@@ -16,12 +17,20 @@ class App {
   }
 
   /**
+   * Registers a middleware function to be applied to incoming requests.
+   * @param middleware - The middleware function to be added to the middleware stack.
+   */
+  use(middleware: Middleware) {
+    this.middleware.push(middleware);
+  }
+
+  /**
    * Registers a GET route with a specified path and handler.
    * @param path - The path for the route.
    * @param handler - The middleware function to handle the route.
    */
   get(path: string, handler: Middleware) {
-    this.router.register('GET', path, handler);
+    this.router.register('GET', path, this.wrapHandler(handler));
   }
 
   /**
@@ -30,7 +39,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   post(path: string, handler: Middleware) {
-    this.router.register('POST', path, handler);
+    this.router.register('POST', path, this.wrapHandler(handler));
   }
 
   /**
@@ -39,7 +48,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   put(path: string, handler: Middleware) {
-    this.router.register('PUT', path, handler);
+    this.router.register('PUT', path, this.wrapHandler(handler));
   }
 
   /**
@@ -48,7 +57,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   delete(path: string, handler: Middleware) {
-    this.router.register('DELETE', path, handler);
+    this.router.register('DELETE', path, this.wrapHandler(handler));
   }
 
   /**
@@ -57,7 +66,7 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   patch(path: string, handler: Middleware) {
-    this.router.register('PATCH', path, handler);
+    this.router.register('PATCH', path, this.wrapHandler(handler));
   }
 
   /**
@@ -67,7 +76,29 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   route(method: HttpMethod, path: string, handler: Middleware) {
-    this.router.register(method, path, handler);
+    this.router.register(method, path, this.wrapHandler(handler));
+  }
+
+  /**
+   * Wraps a route handler to include application-level middleware.
+   * @param handler - The route handler to wrap.
+   * @returns A function that applies middleware before invoking the route handler.
+   */
+  private wrapHandler(handler: Middleware): Middleware {
+    return (req: Request, res: Response, next: () => void) => {
+      const chain = [...this.middleware, handler];
+      let index = 0;
+
+      const applyMiddleware = () => {
+        if (index < chain.length) {
+          chain[index++](req, res, applyMiddleware);
+        } else {
+          next();
+        }
+      };
+
+      applyMiddleware();
+    };
   }
 
   /**
