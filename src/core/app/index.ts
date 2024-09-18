@@ -8,7 +8,7 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 class App {
   private router: Router;
   private middleware: Middleware[] = [];
-  
+
   /**
    * Initializes the App with a Router instance.
    * @param router - The Router instance to be used by the App.
@@ -22,12 +22,19 @@ class App {
   /**
    * Logger middleware that logs incoming requests and the status code after the response is sent.
    */
-  private logger: Middleware = (req: Request, res: Response, next: () => void) => {
+  private logger: Middleware = (
+    req: Request,
+    res: Response,
+    next: () => void
+  ) => {
     const startTime = Date.now();
 
-    res.on('finish', () => {
+    res.on("finish", () => {
       const duration = Date.now() - startTime;
-      Console.status(res.statusCode, `${req.method} ${req.url} ${res.statusCode} - ${duration}ms`);
+      Console.status(
+        res.statusCode,
+        `${req.method} ${req.url} ${res.statusCode} - ${duration}ms`
+      );
     });
 
     next();
@@ -41,24 +48,102 @@ class App {
     this.middleware.push(middleware);
   }
 
+  /**
+   * Registers routes for multiple HTTP methods based on a resource handler object.
+   * @param path - The base path for the resource.
+   * @param middlewares - An array of middleware functions to be applied to all routes.
+   * @param controller - A controller class with static methods named after HTTP methods (get, post, put, delete, patch).
+   */
+  resource(
+    path: string,
+    middlewares: Middleware[],
+    controller: {
+      get?: (req: Request, res: Response) => Promise<void>;
+      post?: (req: Request, res: Response) => Promise<void>;
+      put?: (req: Request, res: Response) => Promise<void>;
+      delete?: (req: Request, res: Response) => Promise<void>;
+      patch?: (req: Request, res: Response) => Promise<void>;
+    }
+  ) {
+    // Extract static methods from the controller
+    const { get, post, put, delete: del, patch } = controller;
+
+    if (get) {
+      this.get(path, ...middlewares, get);
+    }
+    if (post) {
+      this.post(path, ...middlewares, post);
+    }
+    if (put) {
+      this.put(path, ...middlewares, put);
+    }
+    if (del) {
+      this.delete(path, ...middlewares, del);
+    }
+    if (patch) {
+      this.patch(path, ...middlewares, patch);
+    }
+  }
+
+  /**
+   * Registers a get method function to be applied to incoming requests.
+   * @param path - The path for the route.
+   * @param middleware - The middleware function to be added to the middleware stack.
+   */
   get(path: string, ...middlewares: Middleware[]) {
-    this.router.register('GET', path, this.wrapHandler(middlewares.pop()!, middlewares));
+    this.router.register(
+      "GET",
+      path,
+      this.wrapHandler(middlewares.pop()!, middlewares)
+    );
   }
-  
+  /**
+   * Registers a post method function to be applied to incoming requests.
+   * @param path - The path for the route.
+   * @param middleware - The middleware function to be added to the middleware stack.
+   */
   post(path: string, ...middlewares: Middleware[]) {
-    this.router.register('POST', path, this.wrapHandler(middlewares.pop()!, middlewares));
+    this.router.register(
+      "POST",
+      path,
+      this.wrapHandler(middlewares.pop()!, middlewares)
+    );
   }
-  
+  /**
+   * Registers a put method function to be applied to incoming requests.
+   * @param path - The path for the route.
+   * @param middleware - The middleware function to be added to the middleware stack.
+   */
   put(path: string, ...middlewares: Middleware[]) {
-    this.router.register('PUT', path, this.wrapHandler(middlewares.pop()!, middlewares));
+    this.router.register(
+      "PUT",
+      path,
+      this.wrapHandler(middlewares.pop()!, middlewares)
+    );
   }
-  
+  /**
+   * Registers a delete method function to be applied to incoming requests.
+   * @param path - The path for the route.
+   * @param middleware - The middleware function to be added to the middleware stack.
+   */
   delete(path: string, ...middlewares: Middleware[]) {
-    this.router.register('DELETE', path, this.wrapHandler(middlewares.pop()!, middlewares));
+    this.router.register(
+      "DELETE",
+      path,
+      this.wrapHandler(middlewares.pop()!, middlewares)
+    );
   }
-  
+  /**
+   * Registers a patch method function to be applied to incoming requests.
+   * @param path - The path for the route.
+   * @param middleware - The middleware function to be added to the middleware stack.
+   */
   patch(path: string, ...middlewares: Middleware[]) {
-    this.router.register('PATCH', path, this.wrapHandler(middlewares.pop()!, middlewares));
+    this.router.register(
+      "PATCH",
+      path,
+      this.wrapHandler(middlewares.pop()!, middlewares)
+    );
   }
 
   /**
@@ -68,7 +153,11 @@ class App {
    * @param handler - The middleware function to handle the route.
    */
   route(method: HttpMethod, path: string, ...middlewares: Middleware[]) {
-    this.router.register(method, path, this.wrapHandler(middlewares.pop()!, middlewares));
+    this.router.register(
+      method,
+      path,
+      this.wrapHandler(middlewares.pop()!, middlewares)
+    );
   }
 
   /**
@@ -76,12 +165,15 @@ class App {
    * @param handler - The route handler to wrap.
    * @returns A function that applies middleware before invoking the route handler.
    */
-  private wrapHandler(handler: Middleware, routeMiddleware: Middleware[]): Middleware {
+  private wrapHandler(
+    handler: Middleware,
+    routeMiddleware: Middleware[]
+  ): Middleware {
     return (req: Request, res: Response, next: () => void) => {
       // Combine global and route-specific middleware
       const chain = [...this.middleware, ...routeMiddleware, handler];
       let index = 0;
-  
+
       const applyMiddleware = async () => {
         if (index < chain.length) {
           const currentMiddleware = chain[index++];
@@ -95,21 +187,21 @@ class App {
                 }
               });
             });
-            await applyMiddleware();  // Continue to the next middleware/handler
+            await applyMiddleware(); // Continue to the next middleware/handler
           } catch (err) {
             console.error(err);
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Internal Server Error" }));
           }
         } else {
-          next();  // All middleware processed, move to the next in line
+          next(); // All middleware processed, move to the next in line
         }
       };
-  
-      applyMiddleware();  // Start middleware chain
+
+      applyMiddleware(); // Start middleware chain
     };
   }
-  
+
   /**
    * Starts the server and listens for incoming requests on the specified port.
    * @param port - The port to listen on.
