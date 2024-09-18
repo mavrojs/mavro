@@ -1,26 +1,33 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import { Request, Response, Middleware } from "../types";
-import { Router } from "../router";
+import { config } from "../config";
+import { Router, router } from "../router";
 import { Console } from "../utils";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 class App {
   private router: Router;
+
   private middleware: Middleware[] = [];
 
   /**
-   * Initializes the App with a Router instance.
+   * Initializes the App with a Router instance and sets up middleware.
    * @param router - The Router instance to be used by the App.
    */
   constructor(router: Router) {
     this.router = router;
-    // Register global logger middleware
     this.use(this.logger);
+
+    // Add a 404 handler middleware to the stack
+    this.use(this.notFoundHandler);
   }
 
   /**
    * Logger middleware that logs incoming requests and the status code after the response is sent.
+   * @param req - The incoming request object.
+   * @param res - The outgoing response object.
+   * @param next - The function to pass control to the next middleware.
    */
   private logger: Middleware = (
     req: Request,
@@ -41,7 +48,28 @@ class App {
   };
 
   /**
-   * Registers a middleware function to be applied to incoming requests.
+   * 404 handler middleware that sends a 404 response and logs the request details if no route is matched.
+   * @param req - The incoming request object.
+   * @param res - The outgoing response object.
+   * @param next - The function to pass control to the next middleware.
+   */
+  private notFoundHandler: Middleware = (
+    req: Request,
+    res: Response,
+    next: () => void
+  ) => {
+    // If no route is matched, send a 404 response
+    if (res.statusCode === 404) {
+      Console.status(404, `404 Not Found - ${req.method} ${req.url}`);
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Not Found" }));
+    } else {
+      next();
+    }
+  };
+
+  /**
+   * Registers a middleware function to be applied to all incoming requests.
    * @param middleware - The middleware function to be added to the middleware stack.
    */
   use(middleware: Middleware) {
@@ -65,7 +93,6 @@ class App {
       patch?: (req: Request, res: Response) => Promise<void>;
     }
   ) {
-    // Extract static methods from the controller
     const { get, post, put, delete: del, patch } = controller;
 
     if (get) {
@@ -86,9 +113,9 @@ class App {
   }
 
   /**
-   * Registers a get method function to be applied to incoming requests.
-   * @param path - The path for the route.
-   * @param middleware - The middleware function to be added to the middleware stack.
+   * Registers a GET method route with the provided path and middleware functions.
+   * @param path - The path for the GET route.
+   * @param middlewares - Middleware functions to be applied to the route.
    */
   get(path: string, ...middlewares: Middleware[]) {
     this.router.register(
@@ -97,10 +124,11 @@ class App {
       this.wrapHandler(middlewares.pop()!, middlewares)
     );
   }
+
   /**
-   * Registers a post method function to be applied to incoming requests.
-   * @param path - The path for the route.
-   * @param middleware - The middleware function to be added to the middleware stack.
+   * Registers a POST method route with the provided path and middleware functions.
+   * @param path - The path for the POST route.
+   * @param middlewares - Middleware functions to be applied to the route.
    */
   post(path: string, ...middlewares: Middleware[]) {
     this.router.register(
@@ -109,10 +137,11 @@ class App {
       this.wrapHandler(middlewares.pop()!, middlewares)
     );
   }
+
   /**
-   * Registers a put method function to be applied to incoming requests.
-   * @param path - The path for the route.
-   * @param middleware - The middleware function to be added to the middleware stack.
+   * Registers a PUT method route with the provided path and middleware functions.
+   * @param path - The path for the PUT route.
+   * @param middlewares - Middleware functions to be applied to the route.
    */
   put(path: string, ...middlewares: Middleware[]) {
     this.router.register(
@@ -121,10 +150,11 @@ class App {
       this.wrapHandler(middlewares.pop()!, middlewares)
     );
   }
+
   /**
-   * Registers a delete method function to be applied to incoming requests.
-   * @param path - The path for the route.
-   * @param middleware - The middleware function to be added to the middleware stack.
+   * Registers a DELETE method route with the provided path and middleware functions.
+   * @param path - The path for the DELETE route.
+   * @param middlewares - Middleware functions to be applied to the route.
    */
   delete(path: string, ...middlewares: Middleware[]) {
     this.router.register(
@@ -133,10 +163,11 @@ class App {
       this.wrapHandler(middlewares.pop()!, middlewares)
     );
   }
+
   /**
-   * Registers a patch method function to be applied to incoming requests.
-   * @param path - The path for the route.
-   * @param middleware - The middleware function to be added to the middleware stack.
+   * Registers a PATCH method route with the provided path and middleware functions.
+   * @param path - The path for the PATCH route.
+   * @param middlewares - Middleware functions to be applied to the route.
    */
   patch(path: string, ...middlewares: Middleware[]) {
     this.router.register(
@@ -150,7 +181,7 @@ class App {
    * Registers a route with a specified method, path, and handler.
    * @param method - The HTTP method (GET, POST, PUT, DELETE, PATCH).
    * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
+   * @param middlewares - Middleware functions to be applied to the route.
    */
   route(method: HttpMethod, path: string, ...middlewares: Middleware[]) {
     this.router.register(
@@ -161,8 +192,9 @@ class App {
   }
 
   /**
-   * Wraps a route handler to include application-level middleware and logger.
+   * Wraps a route handler to include application-level middleware and handles errors.
    * @param handler - The route handler to wrap.
+   * @param routeMiddleware - Middleware functions specific to the route.
    * @returns A function that applies middleware before invoking the route handler.
    */
   private wrapHandler(
@@ -170,7 +202,6 @@ class App {
     routeMiddleware: Middleware[]
   ): Middleware {
     return (req: Request, res: Response, next: () => void) => {
-      // Combine global and route-specific middleware
       const chain = [...this.middleware, ...routeMiddleware, handler];
       let index = 0;
 
@@ -189,7 +220,7 @@ class App {
             });
             await applyMiddleware(); // Continue to the next middleware/handler
           } catch (err) {
-            console.error(err);
+            Console.error(`${err}`);
             res.writeHead(500, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Internal Server Error" }));
           }
@@ -207,10 +238,14 @@ class App {
    * @param port - The port to listen on.
    * @param callback - Optional callback function to run when the server starts.
    */
-  listen(port: number, callback?: () => void) {
+  private listenCallback() {
+    Console.debug(`Server is running on port http://localhost:${config.port}`);
+  }
+
+  listen(port: number = config.port, callback: () => void = this.listenCallback) {
     const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       const method = req.method as HttpMethod;
-      const url = req.url || "/"; // Default to '/' if URL is undefined
+      const url = req.url || "/";
 
       // Extend res to include a json method
       const extendedRes = res as Response;
@@ -222,7 +257,7 @@ class App {
       try {
         this.router.handleRequest(method, url, req, extendedRes);
       } catch (err) {
-        // Handles any errors that occur during request processing
+        Console.error(`${err}`);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Internal Server Error" }));
       }
@@ -232,5 +267,4 @@ class App {
   }
 }
 
-const router = new Router();
 export const app = new App(router);

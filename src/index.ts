@@ -1,48 +1,25 @@
-import { app, Router } from './core';
-import { Middleware, Request, Response } from './core/types';
-import { Console } from './core/utils';
+import { app, Console } from "./core";
+import { Request, Response, Next, Middleware } from "./core/types";
 
-
-const authHandler:Middleware = (req:Request, res:Response, next:()=>void) =>{
-    console.log("Passing from authHandler");
-    next();
-}
-
-const helloHandler: Middleware = (req:Request, res:Response) => {
-  const { uuid } = req.params;
-  res.json({ message: 'Hello World', uuid });
-  return;
+// Middleware function implementation
+const exempleMiddleware: Middleware = (req, res, next) => {
+    Console.success("Passing through the example middleware");
+    next(); // Pass control to the next middleware or route handler
 };
 
+// Controller function type
+type Controller = (req: Request, res: Response) => void;
 
-app.get('/users/:uuid', authHandler, helloHandler);
+// Controller function implementation
+const exempleController: Controller = (req, res) => {
+    res.json({ message: "hello" });
+};
 
-class HelloController{
-    static async get(req:Request, res: Response): Promise<void>{
-        res.json({ message: 'Hello World from get' });
-        return;
-    }
-    static async post(req:Request, res: Response): Promise<void>{
-        res.json({ message: 'Hello World from post' });
-        return;
-    }
-    static async put(req:Request, res: Response): Promise<void>{
-        res.json({ message: 'Hello World from put' });
-        return;
-    }
-    static async delete(req:Request, res: Response): Promise<void>{
-        res.json({ message: 'Hello World from delete' });
-        return;
-    }
-    static async patch(req:Request, res: Response): Promise<void>{
-        res.json({ message: 'Hello World from patch' });
-        return;
-    }
-}
+// Add the middleware to the application
+app.use(exempleMiddleware);
 
-app.resource('/', [authHandler], HelloController)
+// Define the route and attach the controller function
+app.get('/', exempleController);
 
 // Start the server
-app.listen(1337, () => {
-  Console.debug('Server is running on port 3000');
-});
+app.listen();

@@ -1,6 +1,6 @@
-import { IncomingMessage, ServerResponse } from 'http';
-import { parse } from 'url';
-import { Route, HttpMethod, Middleware } from '../types';
+import { IncomingMessage, ServerResponse } from "http";
+import { parse } from "url";
+import { Route, HttpMethod, Middleware } from "../types";
 
 export class Router {
   private routes: Route[] = [];
@@ -22,7 +22,12 @@ export class Router {
    * @param req - The incoming HTTP request.
    * @param res - The outgoing HTTP response.
    */
-  handleRequest(method: string, path: string, req: IncomingMessage, res: ServerResponse) {
+  handleRequest(
+    method: string,
+    path: string,
+    req: IncomingMessage,
+    res: ServerResponse
+  ) {
     const { pathname, query } = parse(req.url as string, true);
     (req as any).query = query; // Attach query params to req object
 
@@ -34,8 +39,8 @@ export class Router {
       (req as any).params = params; // Attach params to req object
       this.executeHandler(route.handler, req, res);
     } else {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Not Found' }));
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Not Found" }));
     }
   }
 
@@ -46,7 +51,7 @@ export class Router {
    * @returns The matched route or undefined if not found.
    */
   private findRoute(method: string, path: string): Route | undefined {
-    return this.routes.find(route => {
+    return this.routes.find((route) => {
       const params = this.extractParams(route.path, path);
       return route.method === method && params !== null;
     });
@@ -58,12 +63,16 @@ export class Router {
    * @param req - The incoming HTTP request.
    * @param res - The outgoing HTTP response.
    */
-  private executeHandler(handler: Middleware, req: IncomingMessage, res: ServerResponse) {
+  private executeHandler(
+    handler: Middleware,
+    req: IncomingMessage,
+    res: ServerResponse
+  ) {
     try {
       handler(req as any, res as any, () => {});
     } catch (err) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Internal Server Error' }));
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Internal Server Error" }));
     }
   }
 
@@ -73,16 +82,19 @@ export class Router {
    * @param requestPath - The actual request path.
    * @returns A dictionary of extracted parameters or null if no match.
    */
-  private extractParams(routePath: string, requestPath: string): { [key: string]: string } | null {
-    const routeParts = routePath.split('/');
-    const requestParts = requestPath.split('/');
+  private extractParams(
+    routePath: string,
+    requestPath: string
+  ): { [key: string]: string } | null {
+    const routeParts = routePath.split("/");
+    const requestParts = requestPath.split("/");
 
     if (routeParts.length !== requestParts.length) return null;
 
     const params: { [key: string]: string } = {};
 
     for (let i = 0; i < routeParts.length; i++) {
-      if (routeParts[i].startsWith(':')) {
+      if (routeParts[i].startsWith(":")) {
         params[routeParts[i].slice(1)] = requestParts[i];
       } else if (routeParts[i] !== requestParts[i]) {
         return null; // No match

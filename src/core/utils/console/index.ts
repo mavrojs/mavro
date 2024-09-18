@@ -49,16 +49,12 @@ export class Console {
    */
   static status(statusCode: number, message: string) {
     if (statusCode >= 200 && statusCode < 300) {
-      // Success status codes
       this.success(message);
     } else if (statusCode >= 400 && statusCode < 500) {
-      // Client error status codes
       this.warning(message);
     } else if (statusCode >= 500) {
-      // Server error status codes
       this.error(message);
     } else {
-      // Other status codes
       this.info(message);
     }
   }
