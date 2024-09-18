@@ -8,13 +8,15 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 class App {
   private router: Router;
   private middleware: Middleware[] = [];
-
+  
   /**
    * Initializes the App with a Router instance.
    * @param router - The Router instance to be used by the App.
    */
   constructor(router: Router) {
     this.router = router;
+    // Register global logger middleware
+    this.use(this.logger);
   }
 
   /**
@@ -23,10 +25,9 @@ class App {
   private logger: Middleware = (req: Request, res: Response, next: () => void) => {
     const startTime = Date.now();
 
-    
     res.on('finish', () => {
       const duration = Date.now() - startTime;
-      Console.status(res.statusCode, `${req.method} ${req.url} ${res.statusCode} - ${duration}ms`)
+      Console.status(res.statusCode, `${req.method} ${req.url} ${res.statusCode} - ${duration}ms`);
     });
 
     next();
@@ -40,49 +41,24 @@ class App {
     this.middleware.push(middleware);
   }
 
-  /**
-   * Registers a GET route with a specified path and handler.
-   * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
-   */
-  get(path: string, handler: Middleware) {
-    this.router.register("GET", path, this.wrapHandler(handler));
+  get(path: string, ...middlewares: Middleware[]) {
+    this.router.register('GET', path, this.wrapHandler(middlewares.pop()!, middlewares));
   }
-
-  /**
-   * Registers a POST route with a specified path and handler.
-   * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
-   */
-  post(path: string, handler: Middleware) {
-    this.router.register("POST", path, this.wrapHandler(handler));
+  
+  post(path: string, ...middlewares: Middleware[]) {
+    this.router.register('POST', path, this.wrapHandler(middlewares.pop()!, middlewares));
   }
-
-  /**
-   * Registers a PUT route with a specified path and handler.
-   * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
-   */
-  put(path: string, handler: Middleware) {
-    this.router.register("PUT", path, this.wrapHandler(handler));
+  
+  put(path: string, ...middlewares: Middleware[]) {
+    this.router.register('PUT', path, this.wrapHandler(middlewares.pop()!, middlewares));
   }
-
-  /**
-   * Registers a DELETE route with a specified path and handler.
-   * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
-   */
-  delete(path: string, handler: Middleware) {
-    this.router.register("DELETE", path, this.wrapHandler(handler));
+  
+  delete(path: string, ...middlewares: Middleware[]) {
+    this.router.register('DELETE', path, this.wrapHandler(middlewares.pop()!, middlewares));
   }
-
-  /**
-   * Registers a PATCH route with a specified path and handler.
-   * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
-   */
-  patch(path: string, handler: Middleware) {
-    this.router.register("PATCH", path, this.wrapHandler(handler));
+  
+  patch(path: string, ...middlewares: Middleware[]) {
+    this.router.register('PATCH', path, this.wrapHandler(middlewares.pop()!, middlewares));
   }
 
   /**
@@ -91,8 +67,8 @@ class App {
    * @param path - The path for the route.
    * @param handler - The middleware function to handle the route.
    */
-  route(method: HttpMethod, path: string, handler: Middleware) {
-    this.router.register(method, path, this.wrapHandler(handler));
+  route(method: HttpMethod, path: string, ...middlewares: Middleware[]) {
+    this.router.register(method, path, this.wrapHandler(middlewares.pop()!, middlewares));
   }
 
   /**
@@ -100,9 +76,10 @@ class App {
    * @param handler - The route handler to wrap.
    * @returns A function that applies middleware before invoking the route handler.
    */
-  private wrapHandler(handler: Middleware): Middleware {
+  private wrapHandler(handler: Middleware, routeMiddleware: Middleware[]): Middleware {
     return (req: Request, res: Response, next: () => void) => {
-      const chain = [this.logger, ...this.middleware, handler]; // Logger added first
+      // Combine global and route-specific middleware
+      const chain = [...this.middleware, ...routeMiddleware, handler];
       let index = 0;
   
       const applyMiddleware = async () => {
@@ -132,7 +109,7 @@ class App {
       applyMiddleware();  // Start middleware chain
     };
   }
-
+  
   /**
    * Starts the server and listens for incoming requests on the specified port.
    * @param port - The port to listen on.
