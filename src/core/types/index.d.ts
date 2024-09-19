@@ -13,3 +13,4 @@ export * from './mailOptions';
 export * from './cliCommand';
 export * from './config';
 export * from './webSocketMessage';
+export * from './statusCode'

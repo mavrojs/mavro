@@ -1,6 +1,5 @@
-// src/core/controller.ts
-
 import { Response } from "../types";
+import { statusCodes } from "../utils";
 
 /**
  * A base controller class providing static methods for common response operations.
@@ -11,15 +10,19 @@ import { Response } from "../types";
 export class Controller {
   
   /**
-   * Sends a JSON response with the given data.
+   * Sends a JSON response with the given data and status code.
    * 
    * @param res - The response object used to send the response.
    * @param data - The data to be sent in the JSON response.
+   * @param statusCode - The HTTP status code to be sent (default is 200).
    * 
    * This method sets the content type to application/json and sends the provided data as the response body.
    */
-  static json(res: Response, data: any): void {
-    res.json(data);
+  static json(res: Response, data: any, statusCode: number = 200): void {
+    res.json({
+      ...statusCodes[statusCode],
+      data
+    });
   }
 
   /**
@@ -32,6 +35,9 @@ export class Controller {
    * the error message. This is used to indicate that an unexpected error occurred on the server.
    */
   static error(res: Response, message: string): void {
-    res.status(500).json({ error: message });
+    res.json({
+      ...statusCodes[500],
+      error: message
+    });
   }
 }
