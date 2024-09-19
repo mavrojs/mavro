@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 // Define the directory and file path for logs
-const logDirectory = path.join(__dirname, "../../logs");
+const logDirectory = path.join(process.cwd(), 'logs');
 const logFilePath = path.join(logDirectory, "app.log");
 
 /**
@@ -20,14 +20,15 @@ export const logger: Middleware = (req: Request, res: Response, next: () => void
 
   const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
+  const timestamp = new Date().toISOString();
   const startTime = Date.now();
   const { method, url } = req;
 
-  logStream.write(`Request: ${method} ${url}\n`);
+  logStream.write(`[${timestamp}] [Request]: ${method} ${url}\n`);
 
   res.on("finish", () => {
     const duration = Date.now() - startTime;
-    logStream.write(`Response: ${res.statusCode} - ${duration}ms\n\n`);
+    logStream.write(`[${timestamp}] [Response]: ${res.statusCode} - ${duration}ms\n\n`);
     logStream.end();
   });
 
