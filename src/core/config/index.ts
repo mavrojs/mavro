@@ -17,7 +17,6 @@ export const config: Config = {
     password: process.env.DB_PASSWORD || 'password',
     database: process.env.DB_NAME || 'mydatabase',
   },
-  
   cache: {
     type: process.env.CACHE_TYPE || 'memory',
     redis: {
