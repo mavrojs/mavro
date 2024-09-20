@@ -9,3 +9,7 @@ app.use(authMiddleware.handle);
 app.get('/', (req, res) => UserController.get(req, res));
 
 app.listen();
+
+setTimeout(()=>{
+    app.close();
+}, 10000)

@@ -7,8 +7,8 @@ dotenv.config();
  * Provides unified access to database, cache, and general configurations.
  */
 export const config: Config = {
+  host: process.env.HOST || 'http://localhost',
   port: Number(process.env.PORT) || 1337,
-
   database: {
     type: process.env.DB_TYPE || 'postgres',
     host: process.env.DB_HOST || 'localhost',

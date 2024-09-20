@@ -66,6 +66,7 @@ export interface CacheConfig {
  * @property {string} environment - The current application environment (e.g., development, production).
  */
 export interface Config {
+  host: string;
   port: number;
   database: DatabaseConfig;
   cache: CacheConfig;

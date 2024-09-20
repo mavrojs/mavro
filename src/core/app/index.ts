@@ -6,9 +6,9 @@ import { Console } from "../utils";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-class App {
+export class App {
   private router: Router;
-
+  private server: any;
   private middleware: Middleware[] = [];
 
   /**
@@ -242,8 +242,11 @@ class App {
     Console.debug(`Server is running on port http://localhost:${config.port}`);
   }
 
-  listen(port: number = config.port, callback: () => void = this.listenCallback) {
-    const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+  listen(
+    port: number = config.port,
+    callback: () => void = this.listenCallback
+  ) {
+    this.server = createServer((req: IncomingMessage, res: ServerResponse) => {
       const method = req.method as HttpMethod;
       const url = req.url || "/";
 
@@ -263,7 +266,16 @@ class App {
       }
     });
 
-    server.listen(port, callback);
+    this.server.listen(port, callback);
+  }
+
+  /**
+   * Gracefully closes the server and cleans up resources.
+   * @param callback - Optional callback function to be called when the server is closed.
+   */
+  close(callback?: () => void) {
+    Console.debug("Closing server...");
+    this.server.close();
   }
 }
 
