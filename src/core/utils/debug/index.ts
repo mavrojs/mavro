@@ -59,3 +59,5 @@ export class Debug {
     }
   }
 }
+
+export const debug = Debug;

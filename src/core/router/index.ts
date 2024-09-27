@@ -11,8 +11,8 @@ export class Router {
    * @param path - The path for the route.
    * @param handler - The middleware function to handle the route.
    */
-  register(method: HttpMethod, path: string, handler: Middleware) {
-    this.routes.push({ method, path, handler });
+  register(method: HttpMethod, path: string, ...handlers: Middleware[]) {
+    this.routes.push({ method, path, handler: this.chainMiddleware(handlers) });
   }
 
   /**
@@ -37,7 +37,10 @@ export class Router {
       // Call the route's handler with params and handle middleware chaining
       const params = this.extractParams(route.path, pathname as string);
       (req as any).params = params; // Attach params to req object
-      this.executeHandler(route.handler, req, res);
+      route.handler(req as any, res as any, () => {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Route not found" }));
+      });
     } else {
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Not Found" }));
@@ -63,17 +66,28 @@ export class Router {
    * @param req - The incoming HTTP request.
    * @param res - The outgoing HTTP response.
    */
-  private executeHandler(
-    handler: Middleware,
-    req: IncomingMessage,
-    res: ServerResponse
-  ) {
-    try {
-      handler(req as any, res as any, () => {});
-    } catch (err) {
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Internal Server Error" }));
-    }
+  private chainMiddleware(handlers: Middleware[]): Middleware {
+    return (req, res, next) => {
+      let index = 0;
+
+      const executeHandler = () => {
+        const handler = handlers[index++];
+        if (handler) {
+          handler(req, res, (err?: any) => {
+            if (err) {
+              res.writeHead(500, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ error: "Internal Server Error" }));
+            } else {
+              executeHandler();
+            }
+          });
+        } else {
+          next();
+        }
+      };
+
+      executeHandler();
+    };
   }
 
   /**
@@ -103,8 +117,91 @@ export class Router {
 
     return params;
   }
+
+  /**
+   * Registers a GET method route with the provided path and middleware functions.
+   * @param path - The path for the GET route.
+   * @param middlewares - Middleware functions to be applied to the route.
+   */
+  get(path: string, ...middlewares: Middleware[]) {
+    this.register("GET", path, ...middlewares);
+    return this; // Return the router instance for chaining
+  }
+
+  /**
+   * Registers a POST method route with the provided path and middleware functions.
+   * @param path - The path for the POST route.
+   * @param middlewares - Middleware functions to be applied to the route.
+   */
+  post(path: string, ...middlewares: Middleware[]) {
+    this.register("POST", path, ...middlewares);
+    return this;
+  }
+
+  /**
+   * Registers a PUT method route with the provided path and middleware functions.
+   * @param path - The path for the PUT route.
+   * @param middlewares - Middleware functions to be applied to the route.
+   */
+  put(path: string, ...middlewares: Middleware[]) {
+    this.register("PUT", path, ...middlewares);
+    return this;
+  }
+
+  /**
+   * Registers a DELETE method route with the provided path and middleware functions.
+   * @param path - The path for the DELETE route.
+   * @param middlewares - Middleware functions to be applied to the route.
+   */
+  delete(path: string, ...middlewares: Middleware[]) {
+    this.register("DELETE", path, ...middlewares);
+    return this;
+  }
+
+  /**
+   * Registers a PATCH method route with the provided path and middleware functions.
+   * @param path - The path for the PATCH route.
+   * @param middlewares - Middleware functions to be applied to the route.
+   */
+  patch(path: string, ...middlewares: Middleware[]) {
+    this.register("PATCH", path, ...middlewares);
+    return this;
+  }
+
+  /**
+   * Registers routes for multiple HTTP methods based on a resource handler object.
+   * @param path - The base path for the resource.
+   * @param middlewares - An array of middleware functions to be applied to all routes.
+   * @param controller - A controller class with methods named after HTTP methods (get, post, put, delete, patch).
+   */
+  resource(
+    path: string,
+    middlewares: Middleware[],
+    controller: {
+      get?: Middleware;
+      post?: Middleware;
+      put?: Middleware;
+      delete?: Middleware;
+      patch?: Middleware;
+    }
+  ) {
+    if (controller.get) {
+      this.get(path, ...middlewares, controller.get);
+    }
+    if (controller.post) {
+      this.post(path, ...middlewares, controller.post);
+    }
+    if (controller.put) {
+      this.put(path, ...middlewares, controller.put);
+    }
+    if (controller.delete) {
+      this.delete(path, ...middlewares, controller.delete);
+    }
+    if (controller.patch) {
+      this.patch(path, ...middlewares, controller.patch);
+    }
+  }
 }
 
 const router = new Router();
-
 export { router };
