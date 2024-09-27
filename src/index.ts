@@ -6,13 +6,11 @@ function exempleMiddleware(req:Request, res:Response, next:Next){
     next();
 }
 
+
 router.get('/', (req:Request, res:Response)=>{
     res.json({
       message: 'welcome to this world'  
     })
-})
-
-app.use(logger);
-app.use(exempleMiddleware);
+});
 
 app.listen();

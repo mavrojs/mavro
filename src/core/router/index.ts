@@ -1,18 +1,57 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { parse } from "url";
+import { Debug } from "../utils";
 import { Route, HttpMethod, Middleware } from "../types";
 
 export class Router {
   private routes: Route[] = [];
+  private middleware: Middleware[] = [];
+
+  constructor() {
+    // Register the logger middleware globally
+    this.use(this.logger);
+  }
+
+  /**
+   * Registers a middleware function to be applied to all incoming requests.
+   * @param middleware - The middleware function to be added to the middleware stack.
+   */
+  use(middleware: Middleware) {
+    this.middleware.push(middleware);
+  }
+
+  /**
+   * Logger middleware to log request details and response status code.
+   * @param req - The incoming HTTP request.
+   * @param res - The outgoing HTTP response.
+   * @param next - The function to pass control to the next middleware.
+   */
+  private logger: Middleware = (req, res, next) => {
+    const startTime = Date.now();
+
+    res.on("finish", () => {
+      const duration = Date.now() - startTime;
+      Debug.status(
+        res.statusCode,
+        `${req.method} ${req.url} ${res.statusCode} - ${duration}ms`
+      );
+    });
+
+    next();
+  };
 
   /**
    * Registers a route with a specified method, path, and handler.
    * @param method - The HTTP method (GET, POST, PUT, DELETE, PATCH).
    * @param path - The path for the route.
-   * @param handler - The middleware function to handle the route.
+   * @param handlers - The middleware functions to handle the route.
    */
   register(method: HttpMethod, path: string, ...handlers: Middleware[]) {
-    this.routes.push({ method, path, handler: this.chainMiddleware(handlers) });
+    const chainedHandlers = this.chainMiddleware(handlers);
+    this.routes.push({ method, path, handler: chainedHandlers });
+
+    // Log the registration of the route
+    Debug.info(`Registered route: [${method}] ${path}`);
   }
 
   /**
@@ -34,16 +73,13 @@ export class Router {
     const route = this.findRoute(method, pathname as string);
 
     if (route) {
-      // Call the route's handler with params and handle middleware chaining
       const params = this.extractParams(route.path, pathname as string);
       (req as any).params = params; // Attach params to req object
-      route.handler(req as any, res as any, () => {
-        res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Route not found" }));
-      });
+      this.executeMiddleware([...this.middleware, route.handler], req, res);
     } else {
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Not Found" }));
+      Debug.error(`${method} ${path} 404`);
     }
   }
 
@@ -61,33 +97,52 @@ export class Router {
   }
 
   /**
-   * Executes the handler function and middleware chain.
-   * @param handler - The middleware or handler to execute.
-   * @param req - The incoming HTTP request.
-   * @param res - The outgoing HTTP response.
+   * Chains multiple middleware functions and handlers.
+   * @param handlers - An array of middleware functions and the final route handler.
+   * @returns A single middleware function that processes the chain.
    */
   private chainMiddleware(handlers: Middleware[]): Middleware {
     return (req, res, next) => {
       let index = 0;
+      const execute = (err?: any) => {
+        if (err) return err;
+        if (index >= handlers.length) return next();
 
-      const executeHandler = () => {
         const handler = handlers[index++];
-        if (handler) {
-          handler(req, res, (err?: any) => {
-            if (err) {
-              res.writeHead(500, { "Content-Type": "application/json" });
-              res.end(JSON.stringify({ error: "Internal Server Error" }));
-            } else {
-              executeHandler();
-            }
-          });
-        } else {
-          next();
-        }
+        handler(req, res, execute);
       };
-
-      executeHandler();
+      execute();
     };
+  }
+
+  /**
+   * Executes a chain of middleware functions.
+   * @param handlers - The middleware or handler to execute.
+   * @param req - The incoming HTTP request.
+   * @param res - The outgoing HTTP response.
+   */
+  private executeMiddleware(
+    handlers: Middleware[],
+    req: IncomingMessage,
+    res: ServerResponse
+  ) {
+    let index = 0;
+
+    const next = (err?: any) => {
+      if (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Internal Server Error" }));
+        Debug.error(`Error: ${err.message}`);
+        return;
+      }
+
+      if (index >= handlers.length) return;
+
+      const handler = handlers[index++];
+      handler(req as any, res as any, next);
+    };
+
+    next();
   }
 
   /**
@@ -203,5 +258,6 @@ export class Router {
   }
 }
 
+// Create an instance of the Router
 const router = new Router();
 export { router };
