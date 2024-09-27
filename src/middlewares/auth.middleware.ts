@@ -1,9 +1,10 @@
 import { Request, Response, Next } from "../core/types";
 import { Middleware } from "../core/middleware";
+import { Debug } from "../core";
 
 class AuthMiddleware extends Middleware {
   handle(req: Request, res: Response, next: Next): void {
-    console.warn("Pass from the middleware");
+    Debug.warning("Pass from the middleware");
     next();
   }
 }

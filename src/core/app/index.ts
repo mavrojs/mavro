@@ -2,14 +2,15 @@ import { createServer, IncomingMessage, ServerResponse } from "http";
 import { Request, Response, Middleware } from "../types";
 import { config } from "../config";
 import { Router, router } from "../router";
-import { Console } from "../utils";
+import { Debug } from "../utils";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 export class App {
-  private router: Router;
-  private server: any;
-  private middleware: Middleware[] = [];
+  router: Router;
+  server: any;
+  port: number;
+  middleware: Middleware[] = [];
 
   /**
    * Initializes the App with a Router instance and sets up middleware.
@@ -17,9 +18,8 @@ export class App {
    */
   constructor(router: Router) {
     this.router = router;
+    this.port = config.port;
     this.use(this.logger);
-
-    // Add a 404 handler middleware to the stack
     this.use(this.notFoundHandler);
   }
 
@@ -38,7 +38,7 @@ export class App {
 
     res.on("finish", () => {
       const duration = Date.now() - startTime;
-      Console.status(
+      Debug.status(
         res.statusCode,
         `${req.method} ${req.url} ${res.statusCode} - ${duration}ms`
       );
@@ -60,7 +60,7 @@ export class App {
   ) => {
     // If no route is matched, send a 404 response
     if (res.statusCode === 404) {
-      Console.status(404, `404 Not Found - ${req.method} ${req.url}`);
+      Debug.status(404, `404 Not Found - ${req.method} ${req.url}`);
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Not Found" }));
     } else {
@@ -220,7 +220,7 @@ export class App {
             });
             await applyMiddleware(); // Continue to the next middleware/handler
           } catch (err) {
-            Console.error(`${err}`);
+            Debug.error(`${err}`);
             res.writeHead(500, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Internal Server Error" }));
           }
@@ -238,14 +238,15 @@ export class App {
    * @param port - The port to listen on.
    * @param callback - Optional callback function to run when the server starts.
    */
-  private listenCallback() {
-    Console.debug(`Server is running on port http://localhost:${config.port}`);
+  private listenCallback(port:number) {
+    Debug.log(`Server is running on port http://localhost:${port}`);
   }
 
   listen(
     port: number = config.port,
-    callback: () => void = this.listenCallback
+    callback: (port: number) => void = (port) => this.listenCallback(port)
   ) {
+    this.port = port;
     this.server = createServer((req: IncomingMessage, res: ServerResponse) => {
       const method = req.method as HttpMethod;
       const url = req.url || "/";
@@ -260,13 +261,12 @@ export class App {
       try {
         this.router.handleRequest(method, url, req, extendedRes);
       } catch (err) {
-        Console.error(`${err}`);
+        Debug.error(`${err}`);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Internal Server Error" }));
       }
     });
-
-    this.server.listen(port, callback);
+    this.server.listen(port, () => callback(port));
   }
 
   /**
@@ -274,7 +274,7 @@ export class App {
    * @param callback - Optional callback function to be called when the server is closed.
    */
   close(callback?: () => void) {
-    Console.debug("Closing server...");
+    Debug.log("Closing server...");
     this.server.close();
   }
 }

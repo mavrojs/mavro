@@ -1,6 +1,6 @@
 import colors from 'colors';
 
-export class Console {
+export class Debug {
   /**
    * Logs an informational message.
    * @param message - The message to log.
@@ -37,8 +37,8 @@ export class Console {
    * Logs a debug message.
    * @param message - The message to log.
    */
-  static debug(message: string) {
-    console.log(colors.grey(`[DEBUG] ${new Date().toISOString()} - ${message}`));
+  static log(message: string) {
+    console.log(colors.grey(`[LOG] ${new Date().toISOString()} - ${message}`));
   }
 
   /**

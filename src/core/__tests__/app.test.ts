@@ -1,4 +1,4 @@
-import { app, logger, Console, statusCodes } from "../";
+import { app, logger, Debug, statusCodes } from "../";
 import { Request, Response, Next, Middleware } from "../types";
 import { randomUUID } from "crypto";
 
@@ -126,7 +126,7 @@ describe("App Class", () => {
   });
   it("should log incoming requests and response status.", async () => {
     // Spy on the Console to capture logs
-    const consoleSpy = jest.spyOn(Console, 'status').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(Debug, 'status').mockImplementation(() => {});
   
     // Create a simple route
     app.get("/", (req, res) => {

@@ -1,4 +1,5 @@
 import { Request, Response, Next } from "../types";
+import { Debug } from "../utils";
 
 /**
  * A base middleware class providing methods to be extended by custom middleware classes.
@@ -107,7 +108,7 @@ export const loggerMiddleware = (
   res: Response,
   next: () => void
 ): void => {
-  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  Debug.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
   next();
 };
 
@@ -122,7 +123,7 @@ export const errorHandlerMiddleware = async (
   try {
     await next();
   } catch (error) {
-    console.error("Error occurred:", error);
+    Debug.error(`${error}`);
     res.status(500).send("Internal Server Error");
   }
 };
