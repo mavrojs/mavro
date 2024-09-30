@@ -25,6 +25,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Set Git user
+        run: |
+          git config --global user.email "otmannj56@gmail.com"
+          git config --global user.name "iietmoon"
+
       # Build the project
       - name: Build the project
         run: npm run build
