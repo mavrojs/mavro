@@ -16,8 +16,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
+          node-version: "lts/*"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm install
@@ -36,10 +36,10 @@ jobs:
 
       # Commit and push the version changes
       - name: Push changes
-  run: |
-    git config --global user.email "otmannj56@gmail.com"
-    git config --global user.name "iietmoon"
-    git diff-index --quiet HEAD || git push --follow-tags origin release
+        run: |
+          git config --global user.email "otmannj56@gmail.com"
+          git config --global user.name "iietmoon"
+          git diff-index --quiet HEAD || git push --follow-tags origin release
 
 
       - name: Publish to npm
