@@ -32,7 +32,7 @@ jobs:
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm build
+        run: npm run build
 
       # Step 4: Bump the version using standard-version
       - name: Bump version
