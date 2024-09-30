@@ -3,23 +3,23 @@ name: Notification on push
 on:
   push:
     branches:
-    - "*"
+      - "*"
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Discord notification
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        DISCORD_USERNAME: mavrosjs
-        DISCORD_AVATAR: https://i.ibb.co/9w7cb51/mavro-social-media.png
-      uses: Ilshidur/action-discord@master
-      with:
-        args: 'A new activity in mavrojs/mavro.'
-    - name: Discord notification
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      uses: Ilshidur/action-discord@master
+      - name: Discord notification with custom username and avatar
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_USERNAME: mavrosjs
+          DISCORD_AVATAR: https://i.ibb.co/9w7cb51/mavro-social-media.png
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "A new activity in mavrojs/mavro."
+
+      - name: Discord notification without custom details
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        uses: Ilshidur/action-discord@master

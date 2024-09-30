@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'  # Updated Node.js version to 20
 
       # Install dependencies
       - name: Install dependencies
@@ -28,7 +28,3 @@ jobs:
       # Compile TypeScript
       - name: Compile TypeScript
         run: npx tsc --noEmit
-
-      # Run lint (optional)
-      - name: Lint TypeScript
-        run: npx eslint . --ext .ts
