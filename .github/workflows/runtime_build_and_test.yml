@@ -2,9 +2,11 @@ name: Runtime Build and Test
 
 on:
   push:
-    branches: [main]
+    branches:
+      - '**'  # Matches all branches
   pull_request:
-    branches: [main]
+    branches:
+      - '**'  # Matches all branches for pull requests
 
 jobs:
   build-and-test:
