@@ -1,6 +1,6 @@
 {
   "name": "mavro",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha",
   "description": "A minimal, fast, and scalable Node.js framework.",
   "main": "dist/index.js",
   "keywords": [
@@ -19,7 +19,10 @@
     "start": "ts-node dist/index.js",
     "test": "jest",
     "prepare": "husky",
-    "release": "standard-version"
+    "release": "standard-version",
+    "release:alpha": "standard-version --prerelease alpha",
+    "release:beta": "standard-version --prerelease beta",
+    "release:rc": "standard-version --prerelease rc"
   },
   "license": "MIT",
   "repository": {

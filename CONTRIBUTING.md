@@ -1,127 +1,127 @@
-# Contributing to mavro
+# Contributing to Mavro
 
-Thank you for considering contributing to **mavro**! We appreciate your support in making this framework better. By contributing, you help improve the framework for everyone.
-
-This guide will help you understand how to contribute, report bugs, suggest features, and set up your development environment for contributions.
-
-## Code of Conduct
-
-Please note that this project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+Thank you for your interest in contributing to the Mavro framework! This document outlines the process for contributing to the project, from code submissions to managing releases.
 
 ## Table of Contents
-- [How Can I Contribute?](#how-can-i-contribute)
-  - [Reporting Bugs](#reporting-bugs)
-  - [Suggesting Features](#suggesting-features)
-  - [Improving Documentation](#improving-documentation)
-  - [Contributing Code](#contributing-code)
-- [Development Workflow](#development-workflow)
-  - [Setup Development Environment](#setup-development-environment)
-  - [Submitting Pull Requests](#submitting-pull-requests)
-- [Style Guidelines](#style-guidelines)
-- [License](#license)
 
-## How Can I Contribute?
+1. [Introduction](#introduction)
+2. [Getting Started](#getting-started)
+3. [Development Workflow](#development-workflow)
+4. [Code Quality and Testing](#code-quality-and-testing)
+5. [Submitting Pull Requests](#submitting-pull-requests)
+6. [Releasing and Publishing](#releasing-and-publishing)
+7. [Managing Breaking Changes](#managing-breaking-changes)
+8. [Communication and Support](#communication-and-support)
 
-### Reporting Bugs
+## Introduction
 
-If you encounter any bugs or unexpected behavior in **mavro**, please report them by following these steps:
+Mavro is a minimal, fast, and scalable Node.js framework built with Koa.js and TypeScript. It aims to simplify development by providing a modular structure for creating APIs and services. Our goal is to foster a collaborative community, continuously improving Mavro through contributions.
 
-1. **Search existing issues**: Make sure the issue hasn’t already been reported.
-2. **Open a new issue**: If no similar issue exists, create a new one [here](https://github.com/mavrojs/mavro/issues) and include the following:
-   - A descriptive title.
-   - Steps to reproduce the bug.
-   - The expected outcome.
-   - What actually happened, including any error messages.
-   - Your environment details (Node.js version, OS, etc.).
+This document explains the processes and guidelines for contributing to Mavro, including development workflow, testing, and the release process.
 
-### Suggesting Features
+## Getting Started
 
-We welcome new ideas to improve **mavro**! To suggest a feature:
-
-1. **Check the roadmap**: Review the existing roadmap and issues to ensure the feature hasn’t already been planned.
-2. **Open a new issue**: If the feature is new, create an issue [here](https://github.com/mavrojs/mavro/issues) with:
-   - A clear and concise description of the feature.
-   - How it will benefit the framework and its users.
-   - Any potential challenges or alternatives.
-
-### Improving Documentation
-
-Good documentation is essential to helping others use and contribute to the project. If you notice any inconsistencies or missing details in the documentation:
-
-1. **Fork the repository**.
-2. **Make your changes** to the relevant documentation files (usually found in the `docs` directory).
-3. **Submit a pull request** with a clear description of what was updated.
-
-### Contributing Code
-
-Contributing code is one of the most valuable ways to help. Here's how to do so effectively:
-
-1. **Look for open issues**: Start by checking the open issues labeled `help wanted` or `good first issue`.
-2. **Fork the repository**: Clone it to your machine and create a new branch for your changes.
-3. **Make your changes**: Ensure the code is clean, well-commented, and follows the project’s style guidelines.
-4. **Test your changes**: Run any necessary tests to ensure your contributions don’t introduce bugs.
-5. **Submit a pull request**: Once you’re satisfied with your changes, open a pull request following the template provided.
-
-## Development Workflow
-
-### Setup Development Environment
-
-1. **Fork the repository**: Click on the `Fork` button at the top of the GitHub page.
-2. **Clone your fork**:
+1. Fork the repository and clone it locally:
    ```bash
-   git clone https://github.com/your-username/mavro.git
-   cd mavro
+   git clone https://github.com/mavrojs/mavro.git
    ```
-3. **Install dependencies**:
+
+2. Install the dependencies:
    ```bash
    npm install
    ```
-4. **Run the development server**:
+
+3. Ensure you have the required tools:
+   - Node.js 20.x
+   - TypeScript
+   - ESLint
+
+4. Run the project in development mode:
    ```bash
    npm run dev
    ```
-   This command starts the development server and watches for any code changes.
 
-### Submitting Pull Requests
+## Development Workflow
 
-1. **Create a branch**: Always create a new branch for your work, for example:
+We use the following branching and versioning strategies:
+
+- **Branches**:
+  - `main`: The stable branch. Direct commits are prohibited.
+  - `develop`: The primary development branch. Merge feature branches here.
+  - `feature/{name}`: For new features or enhancements.
+  - `fix/{name}`: For bug fixes.
+  - `hotfix/{name}`: For urgent fixes to the `main` branch.
+  - `release/{version}`: For preparing a new release.
+
+- **Versioning**: We follow [Semantic Versioning](https://semver.org/).
+  - **Major (X.0.0)**: Breaking changes.
+  - **Minor (0.X.0)**: New features, no breaking changes.
+  - **Patch (0.0.X)**: Bug fixes.
+
+## Code Quality and Testing
+
+### Linting and Formatting
+
+All code should follow the project's ESLint rules and be formatted using Prettier. Run the following commands to check for issues:
+
+```bash
+npm run lint
+npm run format
+```
+
+### Testing
+
+We use Jest for testing. Ensure all tests pass before submitting a PR:
+
+```bash
+npm test
+```
+
+Tests are located in the `__tests__` directory and should follow the naming convention `*.test.ts`.
+
+## Submitting Pull Requests
+
+1. Ensure your branch is up-to-date with the `develop` branch.
+2. Create a pull request targeting the `develop` branch.
+3. Include a detailed description of your changes.
+4. Follow the pull request template and link any related issues.
+5. Ensure all tests pass and no linting errors exist.
+
+## Releasing and Publishing
+
+### Release Process
+
+1. Merge changes from `develop` to a `release/{version}` branch.
+2. Update the `CHANGELOG.md` with a summary of changes.
+3. Once reviewed, merge `release/{version}` into `main` and tag the release.
+4. Publish to npm:
+
    ```bash
-   git checkout -b feature/my-new-feature
+   npm publish
    ```
-2. **Commit your changes**: Make clear, concise commits, and include descriptive commit messages.
-   ```bash
-   git add .
-   git commit -m "Add feature X to improve Y"
-   ```
-3. **Push to your branch**:
-   ```bash
-   git push origin feature/my-new-feature
-   ```
-4. **Submit a pull request**: Go to your fork on GitHub, navigate to the **Pull Requests** section, and open a new pull request. Include:
-   - A detailed description of the changes.
-   - The issue number if your PR addresses an existing issue.
-   - Screenshots or examples, if applicable.
 
-### Pull Request Guidelines
+5. After the release, merge `main` back into `develop` to synchronize branches.
 
-- **One change per pull request**: Keep each PR focused on one specific change or issue.
-- **Test before submitting**: Ensure your code passes all existing tests and add new tests where necessary.
-- **Clear documentation**: Update the documentation when making changes that affect the framework’s functionality.
+### Publishing Packages
 
-## Style Guidelines
+- All packages should follow the naming convention `@mavro/{package-name}`.
+- Major releases must be approved by core maintainers.
+- Minor and patch releases can be performed by any contributor with publishing rights.
 
-We follow consistent coding conventions to keep the codebase clean and maintainable:
+## Managing Breaking Changes
 
-1. **Linting**: Run the linter before committing your code:
-   ```bash
-   npm run lint
-   ```
-2. **Code formatting**: Use **Prettier** for consistent code formatting. Run:
-   ```bash
-   npm run format
-   ```
-3. **File structure**: Follow the MVC pattern and maintain clear separation of concerns in your codebase.
+Breaking changes require careful review and clear communication:
 
-## License
+1. Open an issue or discussion proposing the breaking change.
+2. Gain consensus from the core team before implementation.
+3. Implement changes on a `feature/breaking-{name}` branch.
+4. Update the documentation and `CHANGELOG.md`.
+5. Ensure a clear migration path for users in the release notes.
 
-By contributing, you agree that your contributions will be licensed under the **MIT License**. For more details, refer to the [LICENSE](LICENSE) file.
+## Communication and Support
+
+- **GitHub Issues**: For bug reports, feature requests, and questions.
+- **Discord**: Join our [Discord channel](https://discord.com/invite/your-channel) for real-time discussion.
+- **Email**: Contact us at support@maya-agency.ma for any other inquiries.
+
+We appreciate all contributions, big or small. Thank you for helping improve Mavro!
