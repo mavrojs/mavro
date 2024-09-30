@@ -54,7 +54,7 @@ jobs:
         run: |
           git add .
           git commit -m "chore(release): bump version [skip ci]"
-          git push origin release
+          git push origin release --force
 
       # Step 9: Publish to npm
       - name: Publish to npm
