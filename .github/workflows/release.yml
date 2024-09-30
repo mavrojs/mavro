@@ -35,11 +35,12 @@ jobs:
         run: npm run release
 
       # Commit and push the version changes
-      - name: Commit version changes
-        run: |
-          git add .
-          git commit -m "chore(release): update version and changelog"
-          git push origin release
+      - name: Push changes
+  run: |
+    git config --global user.email "otmannj56@gmail.com"
+    git config --global user.name "iietmoon"
+    git diff-index --quiet HEAD || git push --follow-tags origin release
+
 
       - name: Publish to npm
         env:
