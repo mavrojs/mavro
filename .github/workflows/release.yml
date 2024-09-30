@@ -29,6 +29,12 @@ jobs:
       - name: Build the project
         run: npm run build
 
+        # Set Git user
+      - name: Set Git user
+        run: |
+          git config --global user.email "otmannj56@gmail.com"
+          git config --global user.name "iietmoon"
+
       # Run standard-version to bump version and generate changelog
       - name: Run standard-version
         run: npm run release
