@@ -25,21 +25,19 @@ jobs:
       - name: Build the project
         run: npm run build
 
-      # Set Git user for the runner
       - name: Set Git user
         run: |
           git config --global user.email "otmannj56@gmail.com"
           git config --global user.name "iietmoon"
 
       - name: Run standard-version
-        run: npm run release:alpha
+        run: npm run release
 
-      # Commit and push the version changes
-      - name: Push changes
+      - name: Commit version bump
         run: |
-          git config --global user.email "otmannj56@gmail.com"
-          git config --global user.name "iietmoon"
-          git diff-index --quiet HEAD || git push --follow-tags origin release
+          git add .
+          git commit -m "chore(release): version bump"
+          git push --follow-tags origin release
 
       - name: 🧪 Publish to npm
         run: |
