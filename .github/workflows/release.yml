@@ -32,7 +32,7 @@ jobs:
           git config --global user.name "iietmoon"
 
       - name: Run standard-version
-        run: npm run release
+        run: npm run release:alpha
 
       # Commit and push the version changes
       - name: Push changes
@@ -41,8 +41,9 @@ jobs:
           git config --global user.name "iietmoon"
           git diff-index --quiet HEAD || git push --follow-tags origin release
 
-
-      - name: Publish to npm
+      - name: 🧪 Publish to npm
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
