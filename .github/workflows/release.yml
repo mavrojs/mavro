@@ -29,12 +29,6 @@ jobs:
       - name: Build the project
         run: npm run build
 
-        # Set Git user
-      - name: Set Git user
-        run: |
-          git config --global user.email "otmannj56@gmail.com"
-          git config --global user.name "iietmoon"
-
       # Run standard-version to bump version and generate changelog
       - name: Run standard-version
         run: npm run release
@@ -48,10 +42,14 @@ jobs:
           message: "chore(release): version bump"
           signoff: true  # This adds the Signed-off-by line
         continue-on-error: true  # Avoid failing if there's nothing to commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Push the tags after committing
       - name: Push tags
         run: git push --follow-tags origin release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Publish to npm
       - name: Publish to npm
