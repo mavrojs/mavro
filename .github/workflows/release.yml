@@ -42,8 +42,8 @@ jobs:
       - name: Add & Commit version bump
         uses: EndBug/add-and-commit@v9
         with:
-          author_name: "github-actions[bot]"
-          author_email: "github-actions[bot]@users.noreply.github.com"
+          author_name: "iietmoon"
+          author_email: "otmannj56@gmail.com"
           message: "chore(release): version bump"
           signoff: true  # This adds the Signed-off-by line
         continue-on-error: true  # Avoid failing if there's nothing to commit
