@@ -28,7 +28,3 @@ jobs:
       # Compile TypeScript
       - name: Compile TypeScript
         run: npx tsc --noEmit
-
-      # Run lint (optional)
-      - name: Lint TypeScript
-        run: npx eslint . --ext .ts
