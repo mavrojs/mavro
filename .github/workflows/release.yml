@@ -10,41 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
           cache: 'npm'
 
-      # Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Build the project
       - name: Build the project
         run: npm run build
 
-      # Run tests
       - name: Run tests
         run: npm test
 
-      # Run the release using standard-version
       - name: Run standard-version
         run: npm run release
 
-      # Push changes (e.g., updated version and tags) back to release branch
       - name: Push changes
         run: |
           git config --global user.email "otmannj56@gmail.com"
           git config --global user.name "iietmoon"
           git push --follow-tags origin release
 
-      # Publish package to npm
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
