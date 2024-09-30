@@ -32,7 +32,7 @@ jobs:
           git config --global user.name "iietmoon"
 
       - name: Run standard-version
-        run: npm run release
+        run: npm run release:alpha
 
       # Commit and push the version changes
       - name: Push changes
