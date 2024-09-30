@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - main  # Change this to the branch you want to trigger the action on
 
 jobs:
   build:
@@ -16,10 +16,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20'
+          node-version: '20' 
 
       - name: Install dependencies
         run: npm install
+
+      - name: Set Git user
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
 
       - name: Build the project
         run: npm run build
@@ -29,10 +34,8 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
           git add .
           git commit -m "Automated commit after build and release" || echo "No changes to commit"
 
       - name: Push changes
-        run: git push origin main
+        run: git push origin main  # Change this to your target branch
