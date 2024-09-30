@@ -1,0 +1,45 @@
+# Node modules and lock files
+node_modules/
+package-lock.json
+yarn.lock
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# Tests and development directories
+*test/
+*tests/
+*__tests__/
+*coverage/
+*examples/
+*scripts/
+
+# Source files (if you are building and compiling from 'src' to 'dist')
+src/
+# Use the below line if you're transpiling from src to dist
+!dist/
+
+# TypeScript build artifacts
+*.tsbuildinfo
+
+# Configuration files and dotfiles
+*.config.js
+*.config.ts
+tsconfig.json
+.eslintignore
+.eslintrc.js
+.prettierrc
+.prettierignore
+.nyc_output/
+.jest/
+.npmignore
+eslint.config.js
+jest.config.js
+
+# IDE and environment specific files
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.*
