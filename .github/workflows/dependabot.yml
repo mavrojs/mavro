@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # To update GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location of the repository
+    schedule:
+      interval: "daily" # Check for updates every day
+
+  # To update npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/" # Location of the repository, change if needed
+    schedule:
+      interval: "daily" # Check for updates every day
