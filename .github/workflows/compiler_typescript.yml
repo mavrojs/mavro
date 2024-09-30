@@ -2,9 +2,11 @@ name: Compiler TypeScript
 
 on:
   push:
-    branches: [main]
+    branches:
+      - '**'  # Matches all branches
   pull_request:
-    branches: [main]
+    branches:
+      - '**'  # Matches all branches for pull requests
 
 jobs:
   compile:
@@ -19,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Updated Node.js version to 20
+          node-version: '20'  # Using Node.js version 20
 
       # Install dependencies
       - name: Install dependencies

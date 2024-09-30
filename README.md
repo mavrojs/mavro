@@ -5,8 +5,11 @@
   </a>
 </p>
 <p align="center">
+  <a href="#">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Project Status">
+  </a>
   <a href="https://github.com/mavrojs/mavro/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="GitHub license">
+    <img src="https://img.shields.io/badge/status-under_development-red?style=flat-square" alt="GitHub license">
   </a>
   <a href="https://www.npmjs.com/package/mavro">
     <img src="https://img.shields.io/npm/v/mavro.svg?style=flat" alt="npm version">
@@ -21,7 +24,6 @@
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
   </a>
 </p>
-
 
 **mavro** is a minimal, fast, and scalable Node.js framework built on Koa.js and powered by TypeScript. It simplifies backend development by offering a complete MVC architecture, a powerful CLI for generating APIs, and built-in features like authentication, caching, and mailing.
 
