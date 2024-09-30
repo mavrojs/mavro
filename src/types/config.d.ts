@@ -8,7 +8,7 @@
  * @property {string} database - The name of the database to connect to.
  */
 export interface DatabaseConfig {
-  type: string;
+  type: 'mysql' | 'sqlite' | 'postgres' | 'mongodb' | 'mariadb' | 'mssql';
   host: string;
   port: number;
   username: string;

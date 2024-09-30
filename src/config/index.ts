@@ -10,7 +10,7 @@ export const config: Config = {
   host: process.env.HOST || 'http://localhost',
   port: Number(process.env.PORT) || 1337,
   database: {
-    type: process.env.DB_TYPE || 'postgres',
+    type: process.env.DB_TYPE as 'mysql' | 'sqlite' | 'postgres' | 'mongodb' | 'mariadb' | 'mssql' || 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT) || 5432,
     username: process.env.DB_USERNAME || 'user',
