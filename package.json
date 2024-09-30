@@ -1,6 +1,6 @@
 {
   "name": "mavro",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "description": "A minimal, fast, and scalable Node.js framework.",
   "main": "dist/index.js",
   "keywords": [
