@@ -41,11 +41,11 @@ jobs:
           git commit -m "Automated commit after build and release" || echo "No changes to commit"
 
       - name: Push changes
-        run: git push origin release  # Change this to your target branch
+        run: git push origin release  # Ensure this matches your branch setup
 
       # Step 9: Publish to npm
       - name: Publish to npm
-        if: steps.git_changes.outcome == 'success'
+        if: success()  # This ensures the npm publish step runs only if previous steps were successful
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           npm publish
