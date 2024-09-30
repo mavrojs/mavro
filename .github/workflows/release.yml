@@ -32,7 +32,7 @@ jobs:
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm build
+        run: npm run build
 
       # Step 4: Bump the version using standard-version
       - name: Bump version
@@ -40,11 +40,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 5: Commit the new version to the release branch
-      - name: Commit new version
+      - name: Check for changes
+        id: git_changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git status
+          git diff-index --quiet HEAD || echo "changes"
+
+      # Step 7: Commit and push only if there are changes
+      - name: Commit new version
+        if: steps.git_changes.outputs.changes == 'changes'
+        run: |
           git add .
           git commit -m "chore(release): bump version [skip ci]"
           git push origin release
