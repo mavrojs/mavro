@@ -25,7 +25,10 @@
     "release": "standard-version",
     "release:alpha": "standard-version --prerelease alpha",
     "release:beta": "standard-version --prerelease beta",
-    "release:rc": "standard-version --prerelease rc"
+    "release:rc": "standard-version --prerelease rc",
+    "examples:install": "cd examples && npm install",
+    "examples:update": "cd examples && npm update",
+    "examples:dev": "cd examples && node index.js"
   },
   "license": "MIT",
   "repository": {
@@ -52,6 +55,8 @@
   },
   "dependencies": {
     "colors": "^1.4.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.7.0",
+    "sequelize": "^6.37.3"
   }
 }
