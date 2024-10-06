@@ -1,6 +1,4 @@
-import { ValidationRules, ValidationResult } from "../types";
-
-type ValidationRule = "required" | "email" | "min";
+import { ValidationRules, ValidationRule, ValidationResult } from "../types";
 
 export class Validator {
   private data: any;
@@ -158,3 +156,5 @@ export class Validator {
     return this.errors;
   }
 }
+
+export const validator  = (data:any, validationRules:ValidationRules) => new Validator(data, validationRules);
