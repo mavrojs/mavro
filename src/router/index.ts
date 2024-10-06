@@ -8,7 +8,6 @@ export class Router {
   private middleware: Middleware[] = [];
 
   constructor() {
-    // Register the logger middleware globally
     this.use(this.logger);
   }
 

@@ -23,12 +23,11 @@
     "test": "jest",
     "prepare": "husky",
     "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
     "release:alpha": "standard-version --prerelease alpha",
     "release:beta": "standard-version --prerelease beta",
-    "release:rc": "standard-version --prerelease rc",
-    "examples:install": "cd examples && npm install",
-    "examples:update": "cd examples && npm update",
-    "examples:dev": "cd examples && node index.js"
+    "release:rc": "standard-version --prerelease rc"
   },
   "license": "MIT",
   "repository": {
