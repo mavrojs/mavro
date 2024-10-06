@@ -48,9 +48,6 @@ export class Router {
   register(method: HttpMethod, path: string, ...handlers: Middleware[]) {
     const chainedHandlers = this.chainMiddleware(handlers);
     this.routes.push({ method, path, handler: chainedHandlers });
-
-    // Log the registration of the route
-    Debug.info(`Registered route: [${method}] ${path}`);
   }
 
   /**
@@ -257,6 +254,5 @@ export class Router {
   }
 }
 
-// Create an instance of the Router
 const router = new Router();
 export { router };

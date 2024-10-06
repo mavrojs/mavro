@@ -250,8 +250,6 @@ export class App {
     this.server = createServer((req: IncomingMessage, res: ServerResponse) => {
       const method = req.method as HttpMethod;
       const url = req.url || "/";
-
-      // Extend res to include a json method
       const extendedRes = res as Response;
       extendedRes.json = function (data: any) {
         this.writeHead(200, { "Content-Type": "application/json" });
